@@ -1,0 +1,12 @@
+{
+  "urls": [
+    {
+      "url": "/Grammy.yaml",
+      "name": "Grammy API"
+    },
+    {
+      "url": "/MusicBandService.yaml",
+      "name": "Music Band Service API"
+    }
+  ]
+}

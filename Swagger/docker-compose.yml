@@ -1,0 +1,14 @@
+version: '3'
+services:
+  swagger-ui:
+    image: swaggerapi/swagger-ui
+    container_name: swagger-ui
+    ports:
+      - "8080:8080"
+    environment:
+      - SWAGGER_CONFIG_URL=/usr/share/nginx/html/swagger-config.json
+    volumes:
+      - /Users/vatset/IdeaProjects/SOA_lab1/Swagger/Grammy.yaml:/usr/share/nginx/html/Grammy.yaml
+      - /Users/vatset/IdeaProjects/SOA_lab1/Swagger/MusicBandService.yaml:/usr/share/nginx/html/MusicBandService.yaml
+      - ./swagger-config.json:/usr/share/nginx/html/swagger-config.json
+      - ./swagger-initializer.js:/usr/share/nginx/html/swagger-initializer.js

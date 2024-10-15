@@ -1,0 +1,70 @@
+openapi: 3.0.0
+info:
+  title: Grammy API
+  version: 1.0.0
+  description: API для номинации и награждения групп через взаимодействие с MusicBand API.
+
+servers:
+  - url: http://localhost/grammy
+
+paths:
+  /band/{band-id}/nominate/{genre}:
+    post:
+      summary: Номинировать группу на премию
+      description: Номинирует группу как лучшую в указанном жанре и создает запись в БД.
+      parameters:
+        - in: path
+          name: band-id
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+          description: Идентификатор группы
+        - in: path
+          name: genre
+          required: true
+          schema:
+            $ref: '#/components/schemas/MusicGenre'
+          description: Жанр для номинации
+      responses:
+        '201':
+          description: Группа успешно номинирована
+        '404':
+          description: Группа не найдена
+        '400':
+          description: Некорректные данные
+  /band/{band-id}/reward/{genre}:
+    post:
+      summary: Наградить группу премией
+      description: Награждает группу как лучшую в указанном жанре и создает запись в БД.
+      parameters:
+        - in: path
+          name: band-id
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+          description: Идентификатор группы
+        - in: path
+          name: genre
+          required: true
+          schema:
+            $ref: '#/components/schemas/MusicGenre'
+          description: Жанр для награждения
+      responses:
+        '201':
+          description: Группа успешно награждена
+        '404':
+          description: Группа не найдена
+        '400':
+          description: Некорректные данные
+
+components:
+  schemas:
+    MusicGenre:
+      type: string
+      enum:
+        - RAP
+        - HIP_HOP
+        - JAZZ
+        - POST_ROCK

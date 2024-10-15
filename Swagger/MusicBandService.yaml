@@ -1,0 +1,330 @@
+openapi: 3.0.0
+info:
+  title: MusicBand API
+  version: 1.0.0
+  description: API для управления коллекцией объектов MusicBand и дополнительных операций.
+
+servers:
+  - url: http://localhost/api
+
+tags:
+  - name: Базовые операции
+    description: CRUD для MusicBand
+  - name: Дополнительные операции
+    description: Расширенная работа с коллекцией
+
+paths:
+  /bands:
+    get:
+      tags:
+        - Базовые операции
+      summary: Получить список всех групп
+      description: Возвращает массив объектов MusicBand с поддержкой фильтрации, сортировки и пагинации.
+      parameters:
+        - in: query
+          name: filter
+          schema:
+            type: string
+          description: Фильтрация по полям объекта (например, `name=Beatles&genre=ROCK`).
+        - in: query
+          name: sort
+          schema:
+            type: string
+          description: Сортировка по полям (например, `name,-numberOfParticipants`).
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 1
+          description: Номер страницы для пагинации.
+        - in: query
+          name: size
+          schema:
+            type: integer
+            default: 10
+          description: Размер страницы для пагинации.
+      responses:
+        '200':
+          description: Успешный ответ с массивом MusicBand
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MusicBand'
+    post:
+      tags:
+        - Базовые операции
+      summary: Добавить новую группу
+      description: Создает новый объект MusicBand.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MusicBandInput'
+      responses:
+        '201':
+          description: Группа успешно создана
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MusicBand'
+        '400':
+          description: Некорректные данные
+  /bands/{id}:
+    get:
+      tags:
+        - Базовые операции
+      summary: Получить группу по ID
+      description: Возвращает объект MusicBand по заданному ID.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+          description: Идентификатор группы
+      responses:
+        '200':
+          description: Успешный ответ с объектом MusicBand
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MusicBand'
+        '404':
+          description: Группа не найдена
+    put:
+      tags:
+        - Базовые операции
+      summary: Обновить группу по ID
+      description: Обновляет существующий объект MusicBand по ID.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+          description: Идентификатор группы
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MusicBandInput'
+      responses:
+        '200':
+          description: Группа успешно обновлена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MusicBand'
+        '400':
+          description: Некорректные данные
+        '404':
+          description: Группа не найдена
+    delete:
+      tags:
+        - Базовые операции
+      summary: Удалить группу по ID
+      description: Удаляет объект MusicBand по заданному ID.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+          description: Идентификатор группы
+      responses:
+        '204':
+          description: Группа успешно удалена
+        '404':
+          description: Группа не найдена
+  /bands/deleteBySinglesCount:
+    delete:
+      tags:
+        - Дополнительные операции
+      summary: Удалить группы по количеству синглов
+      description: Удаляет все группы, у которых поле `singlesCount` эквивалентно заданному значению.
+      parameters:
+        - in: query
+          name: singlesCount
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+          description: Значение поля `singlesCount` для удаления
+      responses:
+        '204':
+          description: Группы успешно удалены
+        '400':
+          description: Некорректные данные
+  /bands/averageNumberOfParticipants:
+    get:
+      tags:
+        - Дополнительные операции
+      summary: Среднее количество участников
+      description: Рассчитывает среднее значение поля `numberOfParticipants` для всех групп.
+      responses:
+        '200':
+          description: Успешный ответ с средним значением
+          content:
+            application/json:
+              schema:
+                type: number
+  /bands/lessThanNumberOfParticipants:
+    get:
+      tags:
+        - Дополнительные операции
+      summary: Группы с меньшим количеством участников
+      description: Возвращает массив групп, у которых `numberOfParticipants` меньше заданного значения.
+      parameters:
+        - in: query
+          name: number
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+          description: Значение для сравнения поля `numberOfParticipants`
+      responses:
+        '200':
+          description: Успешный ответ с массивом MusicBand
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MusicBand'
+        '400':
+          description: Некорректные данные
+
+components:
+  schemas:
+    MusicBand:
+      type: object
+      properties:
+        id:
+          type: integer
+          minimum: 1
+          description: Идентификатор группы (генерируется автоматически)
+        name:
+          type: string
+          description: Название группы
+        coordinates:
+          $ref: '#/components/schemas/Coordinates'
+        creationDate:
+          type: string
+          format: date-time
+          description: Дата создания записи (генерируется автоматически)
+        numberOfParticipants:
+          type: integer
+          minimum: 1
+          description: Количество участников
+        singlesCount:
+          type: integer
+          minimum: 1
+          nullable: true
+          description: Количество синглов
+        genre:
+          $ref: '#/components/schemas/MusicGenre'
+        bestAlbum:
+          $ref: '#/components/schemas/Album'
+      required:
+        - id
+        - name
+        - coordinates
+        - creationDate
+        - numberOfParticipants
+        - genre
+        - bestAlbum
+    MusicBandInput:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Название группы
+        coordinates:
+          $ref: '#/components/schemas/CoordinatesInput'
+        numberOfParticipants:
+          type: integer
+          minimum: 1
+          description: Количество участников
+        singlesCount:
+          type: integer
+          minimum: 1
+          nullable: true
+          description: Количество синглов
+        genre:
+          $ref: '#/components/schemas/MusicGenre'
+        bestAlbum:
+          $ref: '#/components/schemas/AlbumInput'
+      required:
+        - name
+        - coordinates
+        - numberOfParticipants
+        - genre
+        - bestAlbum
+    Coordinates:
+      type: object
+      properties:
+        x:
+          type: number
+          maximum: 183
+          description: Координата X (макс. 183)
+        y:
+          type: integer
+          description: Координата Y
+      required:
+        - x
+        - y
+    CoordinatesInput:
+      type: object
+      properties:
+        x:
+          type: number
+          maximum: 183
+          description: Координата X (макс. 183)
+        y:
+          type: integer
+          description: Координата Y
+      required:
+        - x
+        - y
+    Album:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Название альбома
+        length:
+          type: integer
+          minimum: 1
+          description: Длительность альбома (в секундах)
+      required:
+        - name
+        - length
+    AlbumInput:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Название альбома
+        length:
+          type: integer
+          minimum: 1
+          description: Длительность альбома (в секундах)
+      required:
+        - name
+        - length
+    MusicGenre:
+      type: string
+      enum:
+        - RAP
+        - HIP_HOP
+        - JAZZ
+        - POST_ROCK
+      description: Жанр музыки
+

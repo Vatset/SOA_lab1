@@ -1,0 +1,83 @@
+openapi: 3.0.0
+info:
+  description: API для номинации и награждения групп через взаимодействие с MusicBand
+    API.
+  title: Grammy API
+  version: 1.0.0
+servers:
+- url: http://localhost/grammy
+paths:
+  /band/{band-id}/nominate/{genre}:
+    post:
+      description: Номинирует группу как лучшую в указанном жанре и создает запись
+        в БД.
+      parameters:
+      - description: Идентификатор группы
+        explode: false
+        in: path
+        name: band-id
+        required: true
+        schema:
+          minimum: 1
+          type: integer
+        style: simple
+      - description: Жанр для номинации
+        explode: false
+        in: path
+        name: genre
+        required: true
+        schema:
+          $ref: '#/components/schemas/MusicGenre'
+        style: simple
+      responses:
+        "201":
+          description: Группа успешно номинирована
+        "404":
+          description: Группа не найдена
+        "400":
+          description: Некорректные данные
+      summary: Номинировать группу на премию
+      x-accepts:
+      - application/json
+  /band/{band-id}/reward/{genre}:
+    post:
+      description: Награждает группу как лучшую в указанном жанре и создает запись
+        в БД.
+      parameters:
+      - description: Идентификатор группы
+        explode: false
+        in: path
+        name: band-id
+        required: true
+        schema:
+          minimum: 1
+          type: integer
+        style: simple
+      - description: Жанр для награждения
+        explode: false
+        in: path
+        name: genre
+        required: true
+        schema:
+          $ref: '#/components/schemas/MusicGenre'
+        style: simple
+      responses:
+        "201":
+          description: Группа успешно награждена
+        "404":
+          description: Группа не найдена
+        "400":
+          description: Некорректные данные
+      summary: Наградить группу премией
+      x-accepts:
+      - application/json
+components:
+  schemas:
+    MusicGenre:
+      enum:
+      - RAP
+      - HIP_HOP
+      - JAZZ
+      - POST_ROCK
+      type: string
+
